@@ -5,7 +5,7 @@ Modular thumbnail generation, for CodeIgniter 4
 
 1. Install with Composer: `> composer require tatter/thumbnails`
 2. Load the service: `$thumbnails = service('thumbnails');`
-3. Create your first thumbnail: `$thumbnails->create('bigfile.jpg', 'thumbnail.jpg');
+3. Create your first thumbnail: `$thumbnails->create('bigfile.jpg', 'thumbnail.jpg');`
 
 ## Features
 
