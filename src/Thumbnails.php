@@ -21,6 +21,13 @@ class Thumbnails
 	 */
 	protected $handlers;
 	
+	/**
+	 * Array error messages assigned on failure
+	 *
+	 * @var array
+	 */
+	protected $errors;
+	
 	
 	// initiate library
 	public function __construct(BaseConfig $config)
@@ -32,17 +39,65 @@ class Thumbnails
 		$this->handlers = cache('thumbnailHandlers');
 	}
 	
-	// Reads a file and checks for a support handler to create the thumbnail
-	public function create(string $input, string $output, int $imageType = IMAGETYPE_JPEG, int $width = null, int $height = null)
+	// Return any error messages
+	public function getErrors()
+	{
+		return $this->errors;
+	}
+	
+	// Reads a file and checks for a supported handler to create the thumbnail
+	public function create(string $input, string $output)
 	{
 		$this->ensureHandlers();
-		
+
 		// Check file extensions for a valid handler
 		$extension = pathinfo($input, PATHINFO_EXTENSION);
-		if (empty($this->handler)):
+		if (empty($this->handlers[$extension])):
 			$this->errors[] = lang('Thumbnails.noHandler', [$extension]);
 			return false;
 		endif;
+		
+		// Try each supported handler until one succeeds
+		foreach ($this->handlers[$extension] as $class):
+			$instance = new $class();
+			$result = $instance->create($input, $output, $this->config->imageType, $this->config->width, $this->config->height);
+			if ($result):
+				break;
+			endif;
+		endforeach;
+		
+		// Check for failure
+		if (! $result):
+			$this->errors[] = lang('Thumbnails.handlerFail', [$input]);
+			return false;
+		endif;
+		
+		// Verify the output
+		if (exif_imagetype($output) != $this->config->imageType):
+			$this->errors[] = lang('Thumbnails.createFaile', [$input]);
+			return false;
+		endif;
+		
+		return true;
+	}
+	
+	// Set the output image type
+	// e.g. https://www.php.net/manual/en/function.image-type-to-mime-type.php
+	public function setImageType(int $imageType)
+	{
+		$this->config->imageType = $imageType;
+	}
+	
+	// Set the output image width
+	public function setWidth(int $width)
+	{
+		$this->config->width = $width;
+	}
+	
+	// Set the output image height
+	public function setHeight(int $height)
+	{
+		$this->config->height = $height;
 	}
 	
 	// Check for all supported extensions and their handlers

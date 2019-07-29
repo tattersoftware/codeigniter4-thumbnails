@@ -20,4 +20,8 @@ class Thumbnails extends \Tatter\Thumbnails\Config\Files
 	
 	// Default width to use when creating thumbnails
 	public $height = 200;
+	
+	// Default output image type
+	// e.g. https://www.php.net/manual/en/function.image-type-to-mime-type.php
+	public $imageType = IMAGETYPE_JPEG;
 }

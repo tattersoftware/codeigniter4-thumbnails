@@ -2,5 +2,5 @@
 
 interface ThumbnailInterface
 {	
-	public function create(string $input, string $output, int $imageType = IMAGETYPE_JPEG, int $width = null, int $height = null);
+	public function create(string $input, string $output, int $imageType, int $width, int $height): bool;
 }
