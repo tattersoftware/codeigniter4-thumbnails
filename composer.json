@@ -1,14 +1,14 @@
 {
 	"name": "tatter/files",
-	"description": "File uploads and management, for CodeIgniter 4",
+	"description": "Modular thumbnail generation, for CodeIgniter 4",
 	"keywords": [
 		"codeigniter",
 		"codeigniter4",
-		"files",
-		"uploads",
-		"dropzone"
+		"thumbnails",
+		"thumbs",
+		"images"
 	],
-	"homepage": "https://github.com/tattersoftware/codeigniter4-files",
+	"homepage": "https://github.com/tattersoftware/codeigniter4-thumbnails",
 	"license": "MIT",
 	"authors": [
 		{
@@ -20,17 +20,13 @@
 	],
 	"require": {
 		"php" : "^7.0",
-        "enyo/dropzone": "^5.5",
-		"tatter/alerts": "^1.0",
-		"tatter/audits": "^1.0",
-		"tatter/permits": "^1.0"
 	},
 	"require-dev": {
 		"codeigniter4/framework": "dev-master"
 	},
 	"autoload": {
 		"psr-4": {
-			"Tatter\\Files\\": "src"
+			"Tatter\\Thumbnails\\": "src"
 		}
 	},
 	"scripts": {
