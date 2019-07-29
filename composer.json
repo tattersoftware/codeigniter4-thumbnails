@@ -1,5 +1,5 @@
 {
-	"name": "tatter/files",
+	"name": "tatter/thumbnails",
 	"description": "Modular thumbnail generation, for CodeIgniter 4",
 	"keywords": [
 		"codeigniter",
@@ -19,7 +19,7 @@
 		}
 	],
 	"require": {
-		"php" : "^7.0",
+		"php" : "^7.0"
 	},
 	"require-dev": {
 		"codeigniter4/framework": "dev-master"
