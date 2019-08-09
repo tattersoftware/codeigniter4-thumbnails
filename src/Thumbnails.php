@@ -2,8 +2,7 @@
 
 use CodeIgniter\Config\BaseConfig;
 use CodeIgniter\Config\Services;
-use Tatter\Settings\Models\SettingModel;
-use Tatter\Settings\Exceptions\SettingsException;
+use Tatter\Thumbnails\Models\ThumbnailModel;
 
 class Thumbnails
 {
@@ -15,11 +14,11 @@ class Thumbnails
 	protected $config;
 	
 	/**
-	 * Array of supported extensions and their handlers
+	 * Pre-loaded model.
 	 *
-	 * @var array
+	 * @var \Tatter\Thumbnails\Models\ThumbnailModel
 	 */
-	protected $handlers;
+	protected $model;
 	
 	/**
 	 * Array error messages assigned on failure
@@ -32,11 +31,9 @@ class Thumbnails
 	// initiate library
 	public function __construct(BaseConfig $config)
 	{		
-		// Save the configuration
+		// Save the configuration and model
 		$this->config = $config;
-		
-		// Check for cached version of discovered handlers
-		$this->handlers = cache('thumbnailHandlers');
+		$this->model  = new ThumbnailModel();
 	}
 	
 	// Return any error messages
@@ -48,18 +45,19 @@ class Thumbnails
 	// Reads a file and checks for a supported handler to create the thumbnail
 	public function create(string $input, string $output)
 	{
-		$this->ensureHandlers();
-
-		// Check file extensions for a valid handler
+		// Check file extension for a valid handler
 		$extension = pathinfo($input, PATHINFO_EXTENSION);
-		if (empty($this->handlers[$extension])):
+		$handlers = $this->model->getForExtension($extension);
+		
+		// No handlers matched?
+		if (empty($handlers)):
 			$this->errors[] = lang('Thumbnails.noHandler', [$extension]);
 			return false;
 		endif;
 		
 		// Try each supported handler until one succeeds
-		foreach ($this->handlers[$extension] as $class):
-			$instance = new $class();
+		foreach ($handlers as $handler):
+			$instance = new $handler->class();
 			$result = $instance->create($input, $output, $this->config->imageType, $this->config->width, $this->config->height);
 			if ($result):
 				break;
@@ -74,7 +72,7 @@ class Thumbnails
 		
 		// Verify the output
 		if (exif_imagetype($output) != $this->config->imageType):
-			$this->errors[] = lang('Thumbnails.createFaile', [$input]);
+			$this->errors[] = lang('Thumbnails.createFailed', [$input]);
 			return false;
 		endif;
 		
@@ -98,63 +96,5 @@ class Thumbnails
 	public function setHeight(int $height)
 	{
 		$this->config->height = $height;
-	}
-	
-	// Check for all supported extensions and their handlers
-	protected function ensureHandlers()
-	{
-		if (! is_null($this->handlers))
-			return true;
-		if ($cached = cache('thumbnailHandlers'))
-			return true;
-		
-		$locator = Services::locator(true);
-
-		// get all namespaces from the autoloader
-		$namespaces = Services::autoloader()->getNamespace();
-		
-		// scan each namespace for thumbnail handlers
-		$flag = false;
-		foreach ($namespaces as $namespace => $paths):
-
-			// get any files in /Thumbnails/ for this namespace
-			$files = $locator->listNamespaceFiles($namespace, '/Thumbnails/');
-			foreach ($files as $file):
-			
-				// skip non-PHP files
-				if (substr($file, -4) !== '.php'):
-					continue;
-				endif;
-				
-				// get namespaced class name
-				$name = basename($file, '.php');
-				$class = $namespace . '\Thumbnails\\' . $name;
-				
-				include_once $file;
-
-				// validate the class
-				if (! class_exists($class, false))
-					continue;
-				$instance = new $class();
-				
-				// validate the property
-				if (! isset($instance->extensions))
-					continue;
-				
-				// register each supported extension
-				foreach ($instance->extensions as $extension):
-					if (empty($this->handlers[$extension])):
-						$this->handlers[$extension] = [$class];
-					else:
-						$this->handlers[$extension][] = $class;
-					endif;
-				endforeach;
-			endforeach;
-		endforeach;
-		
-		// Cache the results
-		cache()->save('thumbnailHandlers', $this->handlers, 300);
-		
-		return true;
 	}
 }
