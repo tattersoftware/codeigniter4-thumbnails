@@ -4,8 +4,10 @@ Modular thumbnail generation, for CodeIgniter 4
 ## Quick Start
 
 1. Install with Composer: `> composer require tatter/thumbnails`
-2. Load the service: `$thumbnails = service('thumbnails');`
-3. Create your first thumbnail: `$thumbnails->create('bigfile.jpg', 'thumbnail.jpg');`
+2. Update the database: `> php spark migrate:latest -all`
+3. Register all handlers: `> php spark handlers:register`
+4. Load the service: `$thumbnails = service('thumbnails');`
+5. Create your first thumbnail: `$thumbnails->create('bigfile.jpg', 'thumbnail.jpg');`
 
 ## Features
 
@@ -21,6 +23,27 @@ and always be up-to-date:
 
 Or, install manually by downloading the source files and adding the directory to
 `app/Config/Autoload.php`.
+
+Once the files are downloaded and included in the autoload, run any library migrations
+to ensure the database is setup correctly:
+* `> php spark migrate:latest -all`
+
+**Pro Tip:** You can add the spark command to your composer.json to ensure your database is
+always current with the latest release:
+```
+{
+	...
+    "scripts": {
+        "post-update-cmd": [
+            "composer dump-autoload",
+            "php spark migrate:latest -all"
+        ]
+    },
+	...
+```
+
+You will also need to register handlers for the library (see Tatter\Handlers):
+* `> php spark handlers:register`
 
 ## Configuration (optional)
 
