@@ -54,6 +54,7 @@ class Thumbnails
 			$this->errors[] = lang('Thumbnails.noHandler', [$extension]);
 			return false;
 		endif;
+		log_message('debug', count($handlers) . " thumbnail handlers detected for {$extension}.");
 		
 		// Try each supported handler until one succeeds
 		foreach ($handlers as $handler):
