@@ -2,7 +2,7 @@
 
 use CodeIgniter\Database\Migration;
 
-class Migration_create_table_thumbnailers extends Migration
+class Migration_create_table_thumbnails extends Migration
 {
 	public function up()
 	{
@@ -25,11 +25,11 @@ class Migration_create_table_thumbnailers extends Migration
 		$this->forge->addKey(['deleted_at', 'id']);
 		$this->forge->addKey('created_at');
 		
-		$this->forge->createTable('thumbnailers');
+		$this->forge->createTable('thumbnails');
 	}
 
 	public function down()
 	{
-		$this->forge->dropTable('thumbnailers');
+		$this->forge->dropTable('thumbnails');
 	}
 }

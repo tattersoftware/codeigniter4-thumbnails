@@ -4,7 +4,7 @@ use CodeIgniter\Model;
 
 class ThumbnailModel extends Model
 {
-	protected $table      = 'thumbnailers';
+	protected $table      = 'thumbnails';
 	protected $primaryKey = 'id';
 
 	protected $returnType = 'object';
