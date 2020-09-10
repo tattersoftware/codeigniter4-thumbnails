@@ -20,7 +20,7 @@
 	],
 	"require": {
 		"php" : "^7.0",
-		"tatter/handlers": "^1.0"
+		"tatter/handlers": "^2.0"
 	},
 	"require-dev": {
 		"codeigniter4/framework": "dev-master"
