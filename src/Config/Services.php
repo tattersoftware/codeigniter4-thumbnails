@@ -1,21 +1,27 @@
 <?php namespace Tatter\Thumbnails\Config;
 
 use CodeIgniter\Config\BaseService;
-use CodeIgniter\Database\ConnectionInterface;
+use Tatter\Thumbnails\Config\Thumbnails as ThumbnailsConfig;
+use Tatter\Thumbnails\Thumbnails;
 
 class Services extends BaseService
 {
-    public static function thumbnails(BaseConfig $config = null, bool $getShared = true)
-    {
-		if ($getShared):
+	/**
+	 * Returns an instance of the Thumbnails library
+	 * using the specified configuration.
+	 *
+	 * @param ThumbnailsConfig|null $config
+	 * @param boolean $getShared
+	 *
+	 * @return Thumbnails
+	 */
+    public static function thumbnails(ThumbnailsConfig $config = null, bool $getShared = true): Thumbnails
+	{
+		if ($getShared)
+		{
 			return static::getSharedInstance('thumbnails', $config);
-		endif;
+		}
 
-		// If no config was injected then load one
-		// Prioritizes app/Config if found
-		if (empty($config))
-			$config = config('Thumbnails');
-
-		return new \Tatter\Thumbnails\Thumbnails($config);
+		return new Thumbnails($config ?? config('Thumbnails'));
 	}
 }
