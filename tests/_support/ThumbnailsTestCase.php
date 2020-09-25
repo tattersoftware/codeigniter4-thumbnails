@@ -23,9 +23,9 @@ class ThumbnailsTestCase extends CIUnitTestCase
 	 */
 	protected $root;
 
-    protected function setUp(): void
-    {
-        parent::setUp();
+	protected function setUp(): void
+	{
+		parent::setUp();
 		
 		// Start the virtual filesystem
 		$this->root = vfsStream::setup();
