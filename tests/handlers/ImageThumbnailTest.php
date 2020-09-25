@@ -13,9 +13,9 @@ class ImageThumbnailTest extends ThumbnailsTestCase
 	 */
 	protected $file;
 
-    protected function setUp(): void
-    {
-        parent::setUp();
+	protected function setUp(): void
+	{
+		parent::setUp();
 
 		// Ready the cheeseburger
 		$this->file = new File(SUPPORTPATH . 'assets/image.jpg');

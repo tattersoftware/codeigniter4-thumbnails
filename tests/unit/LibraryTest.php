@@ -19,9 +19,9 @@ class LibraryTest extends ThumbnailsTestCase
 	 */
 	protected $output;
 
-    protected function setUp(): void
-    {
-        parent::setUp();
+	protected function setUp(): void
+	{
+		parent::setUp();
 
 		$this->output = $this->root->url() . '/output.file';
 	}

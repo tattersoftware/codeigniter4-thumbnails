@@ -26,7 +26,7 @@ class ThumbnailsTestCase extends CIUnitTestCase
 	protected function setUp(): void
 	{
 		parent::setUp();
-		
+
 		// Start the virtual filesystem
 		$this->root = vfsStream::setup();
 
@@ -34,7 +34,7 @@ class ThumbnailsTestCase extends CIUnitTestCase
 		$this->config     = new ThumbnailsConfig();
 		$this->thumbnails = new Thumbnails($this->config);
 	}
-	
+
 	protected function tearDown(): void
 	{
 		parent::tearDown();

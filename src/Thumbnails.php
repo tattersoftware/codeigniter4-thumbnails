@@ -21,21 +21,21 @@ class Thumbnails
 	/**
 	 * Output width.
 	 *
-	 * @var int
+	 * @var integer
 	 */
 	protected $width;
 
 	/**
 	 * Output height.
 	 *
-	 * @var int
+	 * @var integer
 	 */
 	protected $height;
 
 	/**
 	 * The image type constant.
 	 *
-	 * @var int
+	 * @var integer
 	 *
 	 * @see https://www.php.net/manual/en/function.image-type-to-mime-type.php
 	 */
@@ -73,7 +73,7 @@ class Thumbnails
 	 * @return $this
 	 */
 	public function reset(): self
-	{		
+	{
 		foreach (['width', 'height', 'imageType'] as $key)
 		{
 			$this->$key = $this->config->$key;
@@ -92,7 +92,7 @@ class Thumbnails
 	 * @return $this
 	 */
 	public function setConfig(ThumbnailsConfig $config = null): self
-	{		
+	{
 		$this->config = $config ?? config('Thumbnails');
 		$this->reset();
 
@@ -102,7 +102,7 @@ class Thumbnails
 	/**
 	 * Sets the output image type.
 	 *
-	 * @param int $imageType
+	 * @param integer $imageType
 	 *
 	 * @return $this
 	 */
@@ -115,7 +115,7 @@ class Thumbnails
 	/**
 	 * Sets the output image width.
 	 *
-	 * @param int $width
+	 * @param integer $width
 	 *
 	 * @return $this
 	 */
@@ -128,7 +128,7 @@ class Thumbnails
 	/**
 	 * Sets the output image height.
 	 *
-	 * @param int $height
+	 * @param integer $height
 	 *
 	 * @return $this
 	 */
@@ -161,7 +161,7 @@ class Thumbnails
 	/**
 	 * Gets all handlers that support a certain file extension.
 	 *
-	 * @param string $extension  The file extension to match
+	 * @param string $extension The file extension to match
 	 *
 	 * @return ThumbnailInterface[]
 	 */
@@ -194,8 +194,8 @@ class Thumbnails
 	 * Reads and verifies the file then passes to a supported handler to
 	 * create the thumbnail.
 	 *
-	 * @param string $input   Path to the input file
-	 * @param string $output  Path to the input file
+	 * @param string $input  Path to the input file
+	 * @param string $output Path to the input file
 	 *
 	 * @return $this
 	 * @throws FileNotFoundException
@@ -207,7 +207,7 @@ class Thumbnails
 		$file = new File($input);
 		if (! $file->isFile())
 		{
-			throw FileNotFoundException::forFileNotFound($input); 
+			throw FileNotFoundException::forFileNotFound($input);
 		}
 
 		// Get the file extension
@@ -218,13 +218,13 @@ class Thumbnails
 
 		// Determine which handlers to use
 		$handlers = $this->handler ? [$this->handler] : $this->matchHandlers($extension);
-		
+
 		// No handlers matched?
 		if (empty($handlers))
 		{
 			throw new ThumbnailsException(lang('Thumbnails.noHandler', [$extension]));
 		}
-		
+
 		// Try each handler until one succeeds
 		$result = false;
 		foreach ($handlers as $handler)

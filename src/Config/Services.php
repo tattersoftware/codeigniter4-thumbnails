@@ -11,11 +11,11 @@ class Services extends BaseService
 	 * using the specified configuration.
 	 *
 	 * @param ThumbnailsConfig|null $config
-	 * @param boolean $getShared
+	 * @param boolean               $getShared
 	 *
 	 * @return Thumbnails
 	 */
-    public static function thumbnails(ThumbnailsConfig $config = null, bool $getShared = true): Thumbnails
+	public static function thumbnails(ThumbnailsConfig $config = null, bool $getShared = true): Thumbnails
 	{
 		if ($getShared)
 		{
