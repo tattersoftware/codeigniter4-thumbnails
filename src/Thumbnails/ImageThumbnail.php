@@ -1,6 +1,7 @@
 <?php namespace Tatter\Thumbnails\Thumbnails;
 
 use CodeIgniter\Files\File;
+use CodeIgniter\Images\Exceptions\ImageException;
 use CodeIgniter\Images\Handlers\BaseHandler as ImagesHandler;
 use Config\Services;
 use Tatter\Handlers\BaseHandler;
@@ -53,10 +54,17 @@ class ImageThumbnail extends BaseHandler implements ThumbnailInterface
 	 */
 	public function create(File $file, string $output, int $imageType, int $width, int $height): bool
 	{
-		return $this->images
-			->withFile($file->getRealPath() ?: $file->__toString())
-			->fit($width, $height, 'center')
-			->convert($imageType)
-			->save($output);
+		try
+		{
+			return $this->images
+				->withFile($file->getRealPath() ?: $file->__toString())
+				->fit($width, $height, 'center')
+				->convert($imageType)
+				->save($output);
+		}
+		catch (ImageException $e)
+		{
+			return false;
+		}
 	}
 }
