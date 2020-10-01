@@ -54,7 +54,7 @@ class ImageThumbnail extends BaseHandler implements ThumbnailInterface
 	public function create(File $file, string $output, int $imageType, int $width, int $height): bool
 	{
 		return $this->images
-			->withFile($file->getRealPath())
+			->withFile($file->getRealPath() ?: $file->__toString())
 			->fit($width, $height, 'center')
 			->convert($imageType)
 			->save($output);
