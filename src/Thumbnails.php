@@ -195,7 +195,7 @@ class Thumbnails
 	 * create the thumbnail.
 	 *
 	 * @param string $input  Path to the input file
-	 * @param string $output Path to the input file
+	 * @param string $output Path to the output file
 	 *
 	 * @return $this
 	 * @throws FileNotFoundException
