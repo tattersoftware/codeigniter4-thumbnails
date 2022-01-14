@@ -28,7 +28,7 @@ class LibraryTest extends ThumbnailsTestCase
 
 	public function testCreatesFile()
 	{
-		$result = $this->thumbnails->create($this->input, $this->output);
+		$this->thumbnails->create($this->input, $this->output);
 
 		$this->assertFileExists($this->output);
 	}
