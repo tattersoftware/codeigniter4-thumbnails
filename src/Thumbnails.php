@@ -214,13 +214,17 @@ class Thumbnails
         $result = false;
 
         foreach ($handlers as $handler) {
-            if ($handler->create($file, $output, $this->imageType, $this->width, $this->height)) {
-                // Verify the output file
-                if (exif_imagetype($output) === $this->imageType) {
-                    $result = true;
-                    break;
-                }
+            if (! $handler->create($file, $output, $this->imageType, $this->width, $this->height)) {
+                continue;
             }
+
+            // Verify the output file
+            if (exif_imagetype($output) !== $this->imageType) {
+                continue;
+            }
+
+            $result = true;
+            break;
         }
 
         $this->reset();

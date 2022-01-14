@@ -44,7 +44,9 @@ return static function (ContainerConfigurator $containerConfigurator): void {
 
     $parameters = $containerConfigurator->parameters();
 
-    $parameters->set(Option::PARALLEL, true);
+    // Temporarily disabled https://github.com/rectorphp/rector/issues/6903
+    // $parameters->set(Option::PARALLEL, true);
+
     // The paths to refactor (can also be supplied with CLI arguments)
     $parameters->set(Option::PATHS, [
         __DIR__ . '/src/',
@@ -57,7 +59,7 @@ return static function (ContainerConfigurator $containerConfigurator): void {
     ]);
 
     // Set the target version for refactoring
-    $parameters->set(Option::PHP_VERSION_FEATURES, PhpVersion::PHP_73);
+    $parameters->set(Option::PHP_VERSION_FEATURES, PhpVersion::PHP_74);
 
     // Auto-import fully qualified class names
     $parameters->set(Option::AUTO_IMPORT_NAMES, true);
