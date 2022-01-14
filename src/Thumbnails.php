@@ -149,7 +149,7 @@ class Thumbnails
 	 */
 	public function setHandler($handler = null): self
 	{
-		if (is_string($handler) && $class = $this->handlers->named($handler))
+		if (is_string($handler) && $class = $this->handlers->find($handler))
 		{
 			$handler = new $class();
 		}
@@ -170,7 +170,7 @@ class Thumbnails
 		$handlers = [];
 
 		// Check all handlers so we can parse the extensions attribute properly
-		foreach ($this->handlers->all() as $class)
+		foreach ($this->handlers->findAll() as $class)
 		{
 			$instance = new $class;
 
