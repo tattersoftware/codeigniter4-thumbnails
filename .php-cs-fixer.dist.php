@@ -6,15 +6,17 @@ use PhpCsFixer\Finder;
 
 $finder = Finder::create()
     ->files()
-    ->in(__DIR__)
+    ->in([
+        __DIR__ . '/src/',
+        __DIR__ . '/tests/',
+    ])
     ->exclude('build')
     ->append([__FILE__]);
 
-// Remove overrides for incremental changes
 $overrides = [
-	'array_indentation' => false,
-	'braces'            => false,
-	'indentation_type'  => false,
+    'array_indentation' => false,
+    'braces'            => false,
+    'indentation_type'  => false,
 ];
 
 $options = [
@@ -23,12 +25,3 @@ $options = [
 ];
 
 return Factory::create(new CodeIgniter4(), $overrides, $options)->forProjects();
-
-/* Reenable For libraries after incremental changes are applied
-return Factory::create(new CodeIgniter4(), $overrides, $options)->forLibrary(
-    'Tatter ________',
-    'Tatter Software',
-    '',
-    2021
-);
- */

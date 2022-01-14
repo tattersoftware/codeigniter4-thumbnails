@@ -1,6 +1,11 @@
 # Tatter\Thumbnails
 Modular thumbnail generation, for CodeIgniter 4
 
+[![](https://github.com/tattersoftware/codeigniter4-thumbnails/workflows/PHPUnit/badge.svg)](https://github.com/tattersoftware/codeigniter4-thumbnails/actions/workflows/test.yml)
+[![](https://github.com/tattersoftware/codeigniter4-thumbnails/workflows/PHPStan/badge.svg)](https://github.com/tattersoftware/codeigniter4-thumbnails/actions/workflows/analyze.yml)
+[![](https://github.com/tattersoftware/codeigniter4-thumbnails/workflows/Deptrac/badge.svg)](https://github.com/tattersoftware/codeigniter4-thumbnails/actions/workflows/inspect.yml)
+[![Coverage Status](https://coveralls.io/repos/github/tattersoftware/codeigniter4-thumbnails/badge.svg?branch=develop)](https://coveralls.io/github/tattersoftware/codeigniter4-thumbnails?branch=develop)
+
 ## Quick Start
 
 1. Install with Composer: `> composer require tatter/thumbnails`

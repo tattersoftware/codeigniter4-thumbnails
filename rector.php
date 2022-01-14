@@ -53,7 +53,7 @@ return static function (ContainerConfigurator $containerConfigurator): void {
 
     // Do you need to include constants, class aliases, or a custom autoloader?
     $parameters->set(Option::BOOTSTRAP_FILES, [
-        realpath(getcwd()) . '/vendor/codeigniter4/codeigniter4/system/Test/bootstrap.php',
+        realpath(getcwd()) . '/vendor/codeigniter4/framework/system/Test/bootstrap.php',
     ]);
 
     // Set the target version for refactoring
