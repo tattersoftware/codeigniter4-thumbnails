@@ -1,4 +1,6 @@
-<?php namespace Tatter\Thumbnails\Thumbnails;
+<?php
+
+namespace Tatter\Thumbnails\Thumbnails;
 
 use CodeIgniter\Files\File;
 use CodeIgniter\Images\Exceptions\ImageException;
@@ -15,7 +17,7 @@ class ImageThumbnail extends BaseHandler implements ThumbnailInterface
 	/**
 	 * Attributes for Tatter\Handlers
 	 *
-	 * @var array<string, string>  Must include keys: name, extensions
+	 * @var array<string, string> Must include keys: name, extensions
 	 */
 	public $attributes = [
 		'name'       => 'Image',
@@ -44,25 +46,23 @@ class ImageThumbnail extends BaseHandler implements ThumbnailInterface
 	/**
 	 * Uses a framework image handler to fit the image to its new size.
 	 *
-	 * @param File    $file      The file that needs a thumbnail
-	 * @param string  $output    Path to the output file
-	 * @param integer $imageType A PHP imagetype constant, https://www.php.net/manual/en/function.image-type-to-mime-type.php
-	 * @param integer $width     Width of the created thumbnail
-	 * @param integer $height    Height of the created thumbnail
+	 * @param File   $file      The file that needs a thumbnail
+	 * @param string $output    Path to the output file
+	 * @param int    $imageType A PHP imagetype constant, https://www.php.net/manual/en/function.image-type-to-mime-type.php
+	 * @param int    $width     Width of the created thumbnail
+	 * @param int    $height    Height of the created thumbnail
 	 *
-	 * @return boolean  Success or failure
+	 * @return bool Success or failure
 	 */
 	public function create(File $file, string $output, int $imageType, int $width, int $height): bool
 	{
-		try
-		{
+		try {
 			return $this->images
-				->withFile($file->getRealPath() ?: $file->__toString())
-				->fit($width, $height, 'center')
-				->convert($imageType)
-				->save($output);
-		}
-		catch (ImageException $e)
+			    ->withFile($file->getRealPath() ?: $file->__toString())
+			    ->fit($width, $height, 'center')
+			    ->convert($imageType)
+			    ->save($output);
+		} catch (ImageException $e)
 		{
 			return false;
 		}

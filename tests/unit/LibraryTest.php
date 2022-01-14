@@ -1,9 +1,11 @@
 <?php
 
 use Tests\Support\ThumbnailsTestCase;
-use Tatter\Thumbnails\Thumbnails;
 
-class LibraryTest extends ThumbnailsTestCase
+/**
+ * @internal
+ */
+final class LibraryTest extends ThumbnailsTestCase
 {
 	/**
 	 * Path to the test file

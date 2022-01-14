@@ -1,10 +1,13 @@
 <?php
 
 use CodeIgniter\Files\File;
-use Tests\Support\ThumbnailsTestCase;
 use Tatter\Thumbnails\Thumbnails\ImageThumbnail;
+use Tests\Support\ThumbnailsTestCase;
 
-class ImageThumbnailTest extends ThumbnailsTestCase
+/**
+ * @internal
+ */
+final class ImageThumbnailTest extends ThumbnailsTestCase
 {
 	/**
 	 * The test file primed for use

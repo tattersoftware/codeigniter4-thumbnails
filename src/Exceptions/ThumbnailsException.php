@@ -1,7 +1,8 @@
-<?php namespace Tatter\Thumbnails\Exceptions;
+<?php
+
+namespace Tatter\Thumbnails\Exceptions;
 
 use CodeIgniter\Exceptions\ExceptionInterface;
-use CodeIgniter\Exceptions\FrameworkException;
 use RuntimeException;
 
 class ThumbnailsException extends RuntimeException implements ExceptionInterface

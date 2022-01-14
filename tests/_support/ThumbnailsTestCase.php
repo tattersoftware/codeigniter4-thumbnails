@@ -1,12 +1,17 @@
-<?php namespace Tests\Support;
+<?php
+
+namespace Tests\Support;
 
 use CodeIgniter\Test\CIUnitTestCase;
-use Tatter\Thumbnails\Config\Thumbnails as ThumbnailsConfig;
-use Tatter\Thumbnails\Thumbnails;
 use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\vfsStreamDirectory;
+use Tatter\Thumbnails\Config\Thumbnails as ThumbnailsConfig;
+use Tatter\Thumbnails\Thumbnails;
 
-class ThumbnailsTestCase extends CIUnitTestCase
+/**
+ * @internal
+ */
+abstract class ThumbnailsTestCase extends CIUnitTestCase
 {
 	/**
 	 * @var ThumbnailsConfig

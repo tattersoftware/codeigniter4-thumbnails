@@ -1,7 +1,7 @@
-<?php namespace Tatter\Thumbnails;
+<?php
 
-use CodeIgniter\Config\BaseConfig;
-use CodeIgniter\Config\Services;
+namespace Tatter\Thumbnails;
+
 use CodeIgniter\Files\Exceptions\FileNotFoundException;
 use CodeIgniter\Files\File;
 use Tatter\Handlers\Handlers;
@@ -21,21 +21,21 @@ class Thumbnails
 	/**
 	 * Output width.
 	 *
-	 * @var integer
+	 * @var int
 	 */
 	protected $width;
 
 	/**
 	 * Output height.
 	 *
-	 * @var integer
+	 * @var int
 	 */
 	protected $height;
 
 	/**
 	 * The image type constant.
 	 *
-	 * @var integer
+	 * @var int
 	 *
 	 * @see https://www.php.net/manual/en/function.image-type-to-mime-type.php
 	 */
@@ -57,10 +57,8 @@ class Thumbnails
 
 	/**
 	 * Initializes the library with its configuration.
-	 *
-	 * @param ThumbnailsConfig|null $config
 	 */
-	public function __construct(ThumbnailsConfig $config = null)
+	public function __construct(?ThumbnailsConfig $config = null)
 	{
 		$this->setConfig($config);
 		$this->handlers = new Handlers('Thumbnails');
@@ -76,7 +74,7 @@ class Thumbnails
 	{
 		foreach (['width', 'height', 'imageType'] as $key)
 		{
-			$this->$key = $this->config->$key;
+			$this->{$key} = $this->config->{$key};
 		}
 
 		$this->handler = null;
@@ -87,11 +85,9 @@ class Thumbnails
 	/**
 	 * Sets the configuration to use.
 	 *
-	 * @param ThumbnailsConfig|null $config
-	 *
 	 * @return $this
 	 */
-	public function setConfig(ThumbnailsConfig $config = null): self
+	public function setConfig(?ThumbnailsConfig $config = null): self
 	{
 		$this->config = $config ?? config('Thumbnails');
 		$this->reset();
@@ -102,39 +98,36 @@ class Thumbnails
 	/**
 	 * Sets the output image type.
 	 *
-	 * @param integer $imageType
-	 *
 	 * @return $this
 	 */
 	public function setImageType(int $imageType): self
 	{
 		$this->imageType = $imageType;
+
 		return $this;
 	}
 
 	/**
 	 * Sets the output image width.
 	 *
-	 * @param integer $width
-	 *
 	 * @return $this
 	 */
 	public function setWidth(int $width): self
 	{
 		$this->width = $width;
+
 		return $this;
 	}
 
 	/**
 	 * Sets the output image height.
 	 *
-	 * @param integer $height
-	 *
 	 * @return $this
 	 */
 	public function setHeight(int $height): self
 	{
 		$this->height = $height;
+
 		return $this;
 	}
 
@@ -143,7 +136,7 @@ class Thumbnails
 	/**
 	 * Specifies the handler to use instead of matching it automatically.
 	 *
-	 * @param ThumbnailInterface|string|null $handler
+	 * @param string|ThumbnailInterface|null $handler
 	 *
 	 * @return $this
 	 */
@@ -172,13 +165,12 @@ class Thumbnails
 		// Check all handlers so we can parse the extensions attribute properly
 		foreach ($this->handlers->findAll() as $class)
 		{
-			$instance = new $class;
+			$instance = new $class();
 
 			if ($instance->extensions === '*')
 			{
 				$handlers[] = $instance;
-			}
-			elseif (stripos($instance->extensions, $extension) !== false)
+			} elseif (stripos($instance->extensions, $extension) !== false)
 			{
 				// Make sure actual matches get preference over generic ones
 				array_unshift($handlers, $instance);
@@ -197,9 +189,10 @@ class Thumbnails
 	 * @param string $input  Path to the input file
 	 * @param string $output Path to the output file
 	 *
-	 * @return $this
 	 * @throws FileNotFoundException
 	 * @throws ThumbnailsException
+	 *
+	 * @return $this
 	 */
 	public function create(string $input, string $output): self
 	{
@@ -227,6 +220,7 @@ class Thumbnails
 
 		// Try each handler until one succeeds
 		$result = false;
+
 		foreach ($handlers as $handler)
 		{
 			if ($handler->create($file, $output, $this->imageType, $this->width, $this->height))
