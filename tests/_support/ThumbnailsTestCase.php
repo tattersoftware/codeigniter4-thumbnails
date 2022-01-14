@@ -13,37 +13,37 @@ use Tatter\Thumbnails\Thumbnails;
  */
 abstract class ThumbnailsTestCase extends CIUnitTestCase
 {
-	/**
-	 * @var ThumbnailsConfig
-	 */
-	protected $config;
+    /**
+     * @var ThumbnailsConfig
+     */
+    protected $config;
 
-	/**
-	 * @var Thumbnails
-	 */
-	protected $thumbnails;
+    /**
+     * @var Thumbnails
+     */
+    protected $thumbnails;
 
-	/**
-	 * @var vfsStreamDirectory|null
-	 */
-	protected $root;
+    /**
+     * @var vfsStreamDirectory|null
+     */
+    protected $root;
 
-	protected function setUp(): void
-	{
-		parent::setUp();
+    protected function setUp(): void
+    {
+        parent::setUp();
 
-		// Start the virtual filesystem
-		$this->root = vfsStream::setup();
+        // Start the virtual filesystem
+        $this->root = vfsStream::setup();
 
-		// Create the service
-		$this->config     = new ThumbnailsConfig();
-		$this->thumbnails = new Thumbnails($this->config);
-	}
+        // Create the service
+        $this->config     = new ThumbnailsConfig();
+        $this->thumbnails = new Thumbnails($this->config);
+    }
 
-	protected function tearDown(): void
-	{
-		parent::tearDown();
+    protected function tearDown(): void
+    {
+        parent::tearDown();
 
-		$this->root = null;
-	}
+        $this->root = null;
+    }
 }
