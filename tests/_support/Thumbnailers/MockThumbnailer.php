@@ -3,10 +3,14 @@
 namespace Tests\Support\Thumbnailers;
 
 use CodeIgniter\Files\File;
+use RuntimeException;
 use Tatter\Thumbnails\Interfaces\ThumbnailerInterface;
 
-class MockThumbnail implements ThumbnailerInterface
+class MockThumbnailer implements ThumbnailerInterface
 {
+    public static $didProcess  = false;
+    public static $shouldError = false;
+
     public static function handlerId(): string
     {
         return 'mock';
@@ -25,6 +29,10 @@ class MockThumbnail implements ThumbnailerInterface
      */
     public function process(File $file, int $imageType, int $width, int $height): string
     {
+        if (self::$shouldError) {
+            throw new RuntimeException('This error happened.');
+        }
+
         $path = tempnam(sys_get_temp_dir(), static::handlerId());
 
         switch ($imageType) {
@@ -36,6 +44,7 @@ class MockThumbnail implements ThumbnailerInterface
         }
 
         copy(SUPPORTPATH . 'assets/thumbnail.' . $extension, $path);
+        self::$didProcess = true;
 
         return $path;
     }
