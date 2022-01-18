@@ -14,24 +14,10 @@ final class LibraryTest extends ThumbnailsTestCase
      */
     protected $input = SUPPORTPATH . 'assets/image.jpg';
 
-    /**
-     * Convenient virtual output path
-     *
-     * @var string
-     */
-    protected $output;
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        $this->output = $this->root->url() . '/output.file';
-    }
-
     public function testCreatesFile()
     {
-        $this->thumbnails->create($this->input, $this->output);
+        $result = $this->thumbnails->create($this->input);
 
-        $this->assertFileExists($this->output);
+        $this->assertFileExists($result);
     }
 }

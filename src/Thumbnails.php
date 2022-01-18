@@ -4,10 +4,11 @@ namespace Tatter\Thumbnails;
 
 use CodeIgniter\Files\Exceptions\FileNotFoundException;
 use CodeIgniter\Files\File;
-use Tatter\Handlers\Handlers;
 use Tatter\Thumbnails\Config\Thumbnails as ThumbnailsConfig;
 use Tatter\Thumbnails\Exceptions\ThumbnailsException;
-use Tatter\Thumbnails\Interfaces\ThumbnailInterface;
+use Tatter\Thumbnails\Factories\ThumbnailerFactory;
+use Tatter\Thumbnails\Interfaces\ThumbnailerInterface;
+use Throwable;
 
 class Thumbnails
 {
@@ -33,6 +34,13 @@ class Thumbnails
     protected $height;
 
     /**
+     * Any error messages from the last run.
+     *
+     * @var array<string, string> Errors as [handlerId => Message]
+     */
+    protected $errors = [];
+
+    /**
      * The image type constant.
      *
      * @var int
@@ -42,26 +50,26 @@ class Thumbnails
     protected $imageType;
 
     /**
-     * Overriding name of a handler to use.
+     * handlerId of an explicit handler to use instead of matching.
      *
      * @var string|null
      */
-    protected $handler;
+    protected $handlerId;
 
     /**
-     * The library for handler discovery.
+     * The factory for handler discovery.
      *
-     * @var Handlers
+     * @var ThumbnailerFactory
      */
-    protected $handlers;
+    protected $factory;
 
     /**
      * Initializes the library with its configuration.
      */
-    public function __construct(?ThumbnailsConfig $config = null)
+    public function __construct(?ThumbnailsConfig $config)
     {
         $this->setConfig($config);
-        $this->handlers = new Handlers('Thumbnails');
+        $this->factory = new ThumbnailerFactory();
     }
 
     /**
@@ -76,9 +84,19 @@ class Thumbnails
             $this->{$key} = $this->config->{$key};
         }
 
-        $this->handler = null;
+        $this->handlerId = null;
 
         return $this;
+    }
+
+    /**
+     * Gets any errors from the last execution.
+     *
+     * @return string[]
+     */
+    public function getErrors(): array
+    {
+        return $this->errors;
     }
 
     /**
@@ -135,16 +153,13 @@ class Thumbnails
     /**
      * Specifies the handler to use instead of matching it automatically.
      *
-     * @param string|ThumbnailInterface|null $handler
+     * @param string|null $handlerId The handlerId, or null to match
      *
      * @return $this
      */
-    public function setHandler($handler = null): self
+    public function setHandler(?string $handlerId = null): self
     {
-        if (is_string($handler) && $class = $this->handlers->find($handler)) {
-            $handler = new $class();
-        }
-        $this->handler = $handler;
+        $this->handlerId = $handlerId;
 
         return $this;
     }
@@ -154,25 +169,18 @@ class Thumbnails
      *
      * @param string $extension The file extension to match
      *
-     * @return ThumbnailInterface[]
+     * @return class-string<ThumbnailerInterface>[]
      */
     public function matchHandlers(string $extension): array
     {
-        $handlers = [];
+        // Check for explicit extension support
+        $handlers = $this->factory->where(['extensions has' => $extension])->findAll();
 
-        // Check all handlers so we can parse the extensions attribute properly
-        foreach ($this->handlers->findAll() as $class) {
-            $instance = new $class();
+        // Add any universal handlers
+        $handlers = array_merge($handlers, $this->factory->where(['extensions ===' => '*'])->findAll());
 
-            if ($instance->extensions === '*') {
-                $handlers[] = $instance;
-            } elseif (stripos($instance->extensions, $extension) !== false) {
-                // Make sure actual matches get preference over generic ones
-                array_unshift($handlers, $instance);
-            }
-        }
-
-        return $handlers;
+        /** @var class-string<ThumbnailerInterface>[] $handlers */
+        return array_unique($handlers);
     }
 
     //--------------------------------------------------------------------
@@ -181,15 +189,14 @@ class Thumbnails
      * Reads and verifies the file then passes to a supported handler to
      * create the thumbnail.
      *
-     * @param string $input  Path to the input file
-     * @param string $output Path to the output file
+     * @param string $input Path to the input file
      *
      * @throws FileNotFoundException
      * @throws ThumbnailsException
      *
-     * @return $this
+     * @return ?string The output path, or null if no handler succeeded
      */
-    public function create(string $input, string $output): self
+    public function create(string $input): ?string
     {
         // Validate the file
         $file = new File($input);
@@ -199,40 +206,38 @@ class Thumbnails
 
         // Get the file extension
         if (! $extension = $file->guessExtension() ?? pathinfo($input, PATHINFO_EXTENSION)) {
-            throw new ThumbnailsException(lang('Thumbnails.noExtension'));
+            throw ThumbnailsException::forNoExtension();
         }
 
-        // Determine which handlers to use
-        $handlers = $this->handler ? [$this->handler] : $this->matchHandlers($extension);
-
-        // No handlers matched?
-        if (empty($handlers)) {
-            throw new ThumbnailsException(lang('Thumbnails.noHandler', [$extension]));
+        // Determine which handler(s) to use
+        if ($this->handlerId !== null && $class = $this->factory->find($this->handlerId)) {
+            $handlers = [$class];
+        } elseif ([] === $handlers = $this->matchHandlers($extension)) {
+            throw ThumbnailsException::forNoHandler($extension);
         }
 
         // Try each handler until one succeeds
-        $result = false;
+        $this->errors = [];
+        /** @var class-string<ThumbnailerInterface>[] $handlers */
+        foreach ($handlers as $class) {
+            $handler = new $class();
 
-        foreach ($handlers as $handler) {
-            if (! $handler->create($file, $output, $this->imageType, $this->width, $this->height)) {
+            try {
+                $path = $handler->process($file, $this->imageType, $this->width, $this->height);
+            } catch (Throwable $e) {
+                $this->errors[$handler::handlerId()] = $e->getMessage();
+
                 continue;
             }
 
             // Verify the output file
-            if (exif_imagetype($output) !== $this->imageType) {
-                continue;
+            if (exif_imagetype($path) === $this->imageType) {
+                $this->reset();
+
+                return $path;
             }
-
-            $result = true;
-            break;
         }
 
-        $this->reset();
-
-        if (! $result) {
-            throw new ThumbnailsException(lang('Thumbnails.createFailed', [$input]));
-        }
-
-        return $this;
+        throw new ThumbnailsException(lang('Thumbnails.createFailed', [$input]));
     }
 }
