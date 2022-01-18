@@ -44,11 +44,6 @@ class ImageThumbnailer implements ThumbnailerInterface
             : service('image', $imagesHandler);
     }
 
-    public function getInterface(): string
-    {
-        return ThumbnailerInterface::class;
-    }
-
     /**
      * Uses a framework image handler to fit the image to its new size.
      *

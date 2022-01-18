@@ -66,7 +66,7 @@ class Thumbnails
     /**
      * Initializes the library with its configuration.
      */
-    public function __construct(?ThumbnailsConfig $config)
+    public function __construct(ThumbnailsConfig $config)
     {
         $this->setConfig($config);
         $this->factory = new ThumbnailerFactory();
@@ -205,7 +205,8 @@ class Thumbnails
         }
 
         // Get the file extension
-        if (! $extension = $file->guessExtension() ?? pathinfo($input, PATHINFO_EXTENSION)) {
+        $extension = pathinfo($input, PATHINFO_EXTENSION) ?: $file->guessExtension();
+        if (empty($extension)) {
             throw ThumbnailsException::forNoExtension();
         }
 
