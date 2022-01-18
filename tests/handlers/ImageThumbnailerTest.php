@@ -1,13 +1,13 @@
 <?php
 
 use CodeIgniter\Files\File;
-use Tatter\Thumbnails\Thumbnails\ImageThumbnail;
+use Tatter\Thumbnails\Thumbnailers\ImageThumbnailer;
 use Tests\Support\ThumbnailsTestCase;
 
 /**
  * @internal
  */
-final class ImageThumbnailTest extends ThumbnailsTestCase
+final class ImageThumbnailerTest extends ThumbnailsTestCase
 {
     /**
      * The test file primed for use
@@ -26,11 +26,10 @@ final class ImageThumbnailTest extends ThumbnailsTestCase
 
     public function testCreatesFile()
     {
-        $handler = new ImageThumbnail();
-        $output  = $this->root->url() . '/output.file';
-        $result  = $handler->create($this->file, $output, $this->config->imageType, $this->config->width, $this->config->height);
+        $handler = new ImageThumbnailer();
+        $result  = $handler->process($this->file, $this->config->imageType, $this->config->width, $this->config->height);
 
-        $this->assertTrue($result);
-        $this->assertFileExists($output);
+        $this->assertIsString($result);
+        $this->assertFileExists($result);
     }
 }
