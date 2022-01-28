@@ -4,6 +4,7 @@ namespace Tests\Support;
 
 use CodeIgniter\Test\CIUnitTestCase;
 use Tatter\Thumbnails\Config\Thumbnails as ThumbnailsConfig;
+use Tatter\Thumbnails\Factories\ThumbnailerFactory;
 use Tatter\Thumbnails\Thumbnails;
 use Tests\Support\Thumbnailers\MockThumbnailer;
 
@@ -12,22 +13,13 @@ use Tests\Support\Thumbnailers\MockThumbnailer;
  */
 abstract class TestCase extends CIUnitTestCase
 {
-    /**
-     * @var ThumbnailsConfig
-     */
-    protected $config;
-
-    /**
-     * @var Thumbnails
-     */
-    protected $thumbnails;
+    protected ThumbnailsConfig $config;
+    protected Thumbnails $thumbnails;
 
     /**
      * Path to the test file
-     *
-     * @var string
      */
-    protected $input = SUPPORTPATH . 'assets/image.jpg';
+    protected string $input = SUPPORTPATH . 'assets/image.jpg';
 
     protected function setUp(): void
     {
@@ -42,5 +34,12 @@ abstract class TestCase extends CIUnitTestCase
 
         MockThumbnailer::$shouldError = false;
         MockThumbnailer::$didProcess  = false;
+    }
+
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+
+        ThumbnailerFactory::reset();
     }
 }
