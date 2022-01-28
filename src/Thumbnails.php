@@ -7,61 +7,43 @@ use CodeIgniter\Files\File;
 use Tatter\Thumbnails\Config\Thumbnails as ThumbnailsConfig;
 use Tatter\Thumbnails\Exceptions\ThumbnailsException;
 use Tatter\Thumbnails\Factories\ThumbnailerFactory;
-use Tatter\Thumbnails\Interfaces\ThumbnailerInterface;
 use Throwable;
 
 class Thumbnails
 {
     /**
      * The configuration instance.
-     *
-     * @var ThumbnailsConfig
      */
-    protected $config;
+    protected ThumbnailsConfig $config;
 
     /**
      * Output width.
-     *
-     * @var int
      */
-    protected $width;
+    protected int $width;
 
     /**
      * Output height.
-     *
-     * @var int
      */
-    protected $height;
+    protected int $height;
 
     /**
      * Any error messages from the last run.
      *
-     * @var array<string, string> Errors as [handlerId => Message]
+     * @var array<string, string> Errors as [handler ID => Message]
      */
-    protected $errors = [];
+    protected array $errors = [];
 
     /**
      * The image type constant.
      *
-     * @var int
-     *
      * @see https://www.php.net/manual/en/function.image-type-to-mime-type.php
      */
-    protected $imageType;
+    protected int $imageType;
 
     /**
-     * handlerId of an explicit handler to use instead of matching.
-     *
-     * @var string|null
+     * ID of an explicit thumbnailer to use instead of matching.
      */
-    protected $handlerId;
-
-    /**
-     * The factory for handler discovery.
-     *
-     * @var ThumbnailerFactory
-     */
-    protected $factory;
+    protected ?string $handlerId = null;
 
     /**
      * Initializes the library with its configuration.
@@ -69,7 +51,6 @@ class Thumbnails
     public function __construct(ThumbnailsConfig $config)
     {
         $this->setConfig($config);
-        $this->factory = new ThumbnailerFactory();
     }
 
     /**
@@ -148,39 +129,18 @@ class Thumbnails
         return $this;
     }
 
-    //--------------------------------------------------------------------
-
     /**
      * Specifies the handler to use instead of matching it automatically.
      *
-     * @param string|null $handlerId The handlerId, or null to match
+     * @param string|null $id The thumbnailer ID, or null to match by extension
      *
      * @return $this
      */
-    public function setHandler(?string $handlerId = null): self
+    public function setHandler(?string $id = null): self
     {
-        $this->handlerId = $handlerId;
+        $this->handlerId = $id;
 
         return $this;
-    }
-
-    /**
-     * Gets all handlers that support a certain file extension.
-     *
-     * @param string $extension The file extension to match
-     *
-     * @return class-string<ThumbnailerInterface>[]
-     */
-    public function matchHandlers(string $extension): array
-    {
-        // Check for explicit extension support
-        $handlers = $this->factory->where(['extensions has' => $extension])->findAll();
-
-        // Add any universal handlers
-        $handlers = array_merge($handlers, $this->factory->where(['extensions ===' => '*'])->findAll());
-
-        /** @var class-string<ThumbnailerInterface>[] $handlers */
-        return array_unique($handlers);
     }
 
     //--------------------------------------------------------------------
@@ -211,22 +171,20 @@ class Thumbnails
         }
 
         // Determine which handler(s) to use
-        if ($this->handlerId !== null && $class = $this->factory->find($this->handlerId)) {
-            $handlers = [$class];
-        } elseif ([] === $handlers = $this->matchHandlers($extension)) {
+        if ($this->handlerId !== null && $class = ThumbnailerFactory::find($this->handlerId)) {
+            $thumbnailers = [$class];
+        } elseif ([] === $thumbnailers = ThumbnailerFactory::findForExtension($extension)) {
             throw ThumbnailsException::forNoHandler($extension);
         }
 
         // Try each handler until one succeeds
         $this->errors = [];
-        /** @var class-string<ThumbnailerInterface>[] $handlers */
-        foreach ($handlers as $class) {
-            $handler = new $class();
 
+        foreach ($thumbnailers as $thumbnailer) {
             try {
-                $path = $handler->process($file, $this->imageType, $this->width, $this->height);
+                $path = $thumbnailer::process($file, $this->imageType, $this->width, $this->height);
             } catch (Throwable $e) {
-                $this->errors[$handler::handlerId()] = $e->getMessage();
+                $this->errors[$thumbnailer::HANDLER_ID] = $e->getMessage();
 
                 continue;
             }

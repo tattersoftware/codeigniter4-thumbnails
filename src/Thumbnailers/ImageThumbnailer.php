@@ -5,44 +5,15 @@ namespace Tatter\Thumbnails\Thumbnailers;
 use CodeIgniter\Files\File;
 use CodeIgniter\Images\Exceptions\ImageException;
 use CodeIgniter\Images\Handlers\BaseHandler as ImagesHandler;
-use Tatter\Thumbnails\Interfaces\ThumbnailerInterface;
+use Tatter\Thumbnails\BaseThumbnailer;
 
 /**
  * Crops and fits a thumbnail from an image
  */
-class ImageThumbnailer implements ThumbnailerInterface
+class ImageThumbnailer extends BaseThumbnailer
 {
-    /**
-     * Image handler to use
-     *
-     * @var ImagesHandler
-     */
-    protected $images;
-
-    public static function handlerId(): string
-    {
-        return 'image';
-    }
-
-    public static function attributes(): array
-    {
-        return [
-            'name'       => 'Image',
-            'extensions' => 'jpg,jpeg,png,gif,xbm,xpm,wbmp,webp,bmp',
-        ];
-    }
-
-    /**
-     * Accepts an explicit Image Manipulation Handler as optional injection
-     *
-     * @param ImagesHandler|string|null $imagesHandler Image handler, or classname for Config\Images::$handlers
-     */
-    public function __construct($imagesHandler = null)
-    {
-        $this->images = $imagesHandler instanceof ImagesHandler
-            ? $imagesHandler
-            : service('image', $imagesHandler);
-    }
+    public const HANDLER_ID = 'image';
+    public const EXTENSIONS = ['jpg', 'jpeg', 'png', 'gif', 'xbm', 'xpm', 'wbmp', 'webp', 'bmp'];
 
     /**
      * Uses a framework image handler to fit the image to its new size.
@@ -56,12 +27,12 @@ class ImageThumbnailer implements ThumbnailerInterface
      *
      * @return string Path to the newly-created file
      */
-    public function process(File $file, int $imageType, int $width, int $height): string
+    public static function process(File $file, int $imageType, int $width, int $height): string
     {
-        $path = tempnam(sys_get_temp_dir(), static::handlerId());
+        $image = service('image');
+        $path  = tempnam(sys_get_temp_dir(), static::HANDLER_ID);
 
-        $this->images
-            ->withFile($file->getRealPath() ?: $file->__toString())
+        $image->withFile($file->getRealPath() ?: $file->__toString())
             ->fit($width, $height, 'center')
             ->convert($imageType)
             ->save($path);

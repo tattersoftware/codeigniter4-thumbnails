@@ -1,13 +1,15 @@
 <?php
 
-namespace Tatter\Thumbnails\Interfaces;
+namespace Tatter\Thumbnails;
 
 use CodeIgniter\Files\File;
 use RuntimeException;
-use Tatter\Handlers\Interfaces\HandlerInterface;
 
-interface ThumbnailerInterface extends HandlerInterface
+abstract class BaseThumbnailer
 {
+    public const HANDLER_ID = '';
+    public const EXTENSIONS = [];
+
     /**
      * Creates a new thumbnail from a file.
      *
@@ -20,5 +22,5 @@ interface ThumbnailerInterface extends HandlerInterface
      *
      * @return string Path to the newly-created file
      */
-    public function process(File $file, int $imageType, int $width, int $height): string;
+    abstract public static function process(File $file, int $imageType, int $width, int $height): string;
 }

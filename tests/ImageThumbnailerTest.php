@@ -1,7 +1,6 @@
 <?php
 
 use CodeIgniter\Files\File;
-use CodeIgniter\Images\Handlers\GDHandler;
 use Tatter\Thumbnails\Thumbnailers\ImageThumbnailer;
 use Tests\Support\TestCase;
 
@@ -12,10 +11,8 @@ final class ImageThumbnailerTest extends TestCase
 {
     /**
      * The test file primed for use
-     *
-     * @var File
      */
-    protected $file;
+    protected File $file;
 
     protected function setUp(): void
     {
@@ -27,20 +24,9 @@ final class ImageThumbnailerTest extends TestCase
 
     public function testProcessCreatesFile()
     {
-        $handler = new ImageThumbnailer();
-        $result  = $handler->process($this->file, $this->config->imageType, $this->config->width, $this->config->height);
+        $result = ImageThumbnailer::process($this->file, $this->config->imageType, $this->config->width, $this->config->height);
 
         $this->assertIsString($result);
         $this->assertFileExists($result);
-    }
-
-    public function testUsesHandler()
-    {
-        $images  = new GDHandler();
-        $handler = new ImageThumbnailer($images);
-
-        $result = $this->getPrivateProperty($handler, 'images');
-
-        $this->assertSame($images, $result);
     }
 }

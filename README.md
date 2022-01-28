@@ -22,10 +22,12 @@ could possibly want to thumbnail: videos, 3D assets, text documents.
 
 Install easily via Composer to take advantage of CodeIgniter 4's autoloading capabilities
 and always be up-to-date:
-* `> composer require tatter/thumbnails`
+```bash
+composer require tatter/thumbnails
+```
 
 Or, install manually by downloading the source files and adding the directory to
-`app/Config/Autoload.php`.
+**app/Config/Autoload.php**.
 
 ## Configuration (optional)
 
@@ -45,14 +47,14 @@ $thumbnails->setWidth(120);
 
 ## Extending
 
-The library looks across all namespaces for a **Thumbnails/** directory and loads any
+The library looks across all namespaces for a **Thumbnailers/** directory and loads any
 supported classes it find. Each class defines the extensions it supports as well as its own
-`create()` method to generate the image. Add additional extension support from other modules,
+`process()` method to generate the image. Add additional extension support from other modules,
 or write your own. Files will be processed by matching the extension to each handler's list
-of supported extension. You may also specify a specific handler to use with the
-`setHandler()` method.
+of supported extension. You may also specify a specific handler to use by with the
+`setHandler(string $id)` method (see [Tatter\Handlers](https://github.com/tattersoftware/codeigniter4-handlers)).
 
 ## Contributing
 
 This library will periodically update with new supported extensions, but please feel free
-to submit Pull Requests with additional handlers (or bugfixes).
+to submit Pull Requests with additional handlers (or bug fixes).
