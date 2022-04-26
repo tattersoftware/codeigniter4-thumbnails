@@ -11,8 +11,8 @@ class MockThumbnailer extends BaseThumbnailer
     public const HANDLER_ID = 'mock';
     public const EXTENSIONS = ['*'];
 
-    public static $didProcess  = false;
-    public static $shouldError = false;
+    public static bool $didProcess  = false;
+    public static bool $shouldError = false;
 
     /**
      * Blindly creates a file to match $imageType.
