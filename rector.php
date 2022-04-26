@@ -8,11 +8,11 @@ use Rector\CodeQuality\Rector\FuncCall\AddPregQuoteDelimiterRector;
 use Rector\CodeQuality\Rector\FuncCall\ChangeArrayPushToArrayAssignRector;
 use Rector\CodeQuality\Rector\FuncCall\SimplifyRegexPatternRector;
 use Rector\CodeQuality\Rector\FuncCall\SimplifyStrposLowerRector;
+use Rector\CodeQuality\Rector\FunctionLike\SimplifyUselessVariableRector;
 use Rector\CodeQuality\Rector\If_\CombineIfRector;
 use Rector\CodeQuality\Rector\If_\ShortenElseIfRector;
 use Rector\CodeQuality\Rector\If_\SimplifyIfElseToTernaryRector;
 use Rector\CodeQuality\Rector\If_\SimplifyIfReturnBoolRector;
-use Rector\CodeQuality\Rector\Return_\SimplifyUselessVariableRector;
 use Rector\CodeQuality\Rector\Ternary\UnnecessaryTernaryExpressionRector;
 use Rector\CodingStyle\Rector\ClassMethod\FuncGetArgsToVariadicParamRector;
 use Rector\CodingStyle\Rector\ClassMethod\MakeInheritedMethodVisibilitySameAsParentRector;
@@ -29,6 +29,7 @@ use Rector\Php55\Rector\String_\StringClassNameToClassConstantRector;
 use Rector\Php56\Rector\FunctionLike\AddDefaultValueForUndefinedVariableRector;
 use Rector\Php73\Rector\FuncCall\JsonThrowOnErrorRector;
 use Rector\Php73\Rector\FuncCall\StringifyStrNeedlesRector;
+use Rector\Php74\Rector\Property\TypedPropertyRector;
 use Rector\PHPUnit\Set\PHPUnitSetList;
 use Rector\PSR4\Rector\FileWithoutNamespace\NormalizeNamespaceByPSR4ComposerAutoloadRector;
 use Rector\Set\ValueObject\LevelSetList;
@@ -44,19 +45,26 @@ return static function (ContainerConfigurator $containerConfigurator): void {
 
     $parameters = $containerConfigurator->parameters();
 
-    // Temporarily disabled https://github.com/rectorphp/rector/issues/6903
-    // $parameters->set(Option::PARALLEL, true);
-
+    $parameters->set(Option::PARALLEL, true);
     // The paths to refactor (can also be supplied with CLI arguments)
     $parameters->set(Option::PATHS, [
         __DIR__ . '/src/',
         __DIR__ . '/tests/',
     ]);
 
+    // Include Composer's autoload - required for global execution, remove if running locally
+    $parameters->set(Option::AUTOLOAD_PATHS, [
+        __DIR__ . '/vendor/autoload.php',
+    ]);
+
     // Do you need to include constants, class aliases, or a custom autoloader?
     $parameters->set(Option::BOOTSTRAP_FILES, [
         realpath(getcwd()) . '/vendor/codeigniter4/framework/system/Test/bootstrap.php',
     ]);
+
+    if (is_file(__DIR__ . '/phpstan.neon.dist')) {
+        $parameters->set(Option::PHPSTAN_FOR_RECTOR_PATH, __DIR__ . '/phpstan.neon.dist');
+    }
 
     // Set the target version for refactoring
     $parameters->set(Option::PHP_VERSION_FEATURES, PhpVersion::PHP_74);
@@ -77,6 +85,11 @@ return static function (ContainerConfigurator $containerConfigurator): void {
         // Ignore tests that might make calls without a result
         RemoveEmptyMethodCallRector::class => [
             __DIR__ . '/tests',
+        ],
+
+        // Ignore files that should not be namespaced
+        NormalizeNamespaceByPSR4ComposerAutoloadRector::class => [
+            __DIR__ . '/src/Helpers',
         ],
 
         // May load view files directly when detecting classes
@@ -110,4 +123,8 @@ return static function (ContainerConfigurator $containerConfigurator): void {
     $services->set(MakeInheritedMethodVisibilitySameAsParentRector::class);
     $services->set(SimplifyEmptyArrayCheckRector::class);
     $services->set(NormalizeNamespaceByPSR4ComposerAutoloadRector::class);
+    $services->set(TypedPropertyRector::class)
+        ->configure([
+            TypedPropertyRector::INLINE_PUBLIC => true,
+        ]);
 };

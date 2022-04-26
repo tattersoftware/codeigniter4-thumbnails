@@ -25,14 +25,14 @@
     },
     "require-dev": {
         "codeigniter4/framework": "^4.1",
-        "codeigniter4/devkit": "^1.0"
+        "tatter/tools": "^2.0"
     },
     "config": {
-        "optimize-autoloader": true,
-        "sort-packages": true,
         "allow-plugins": {
             "phpstan/extension-installer": true
-        }
+        },
+        "optimize-autoloader": true,
+        "sort-packages": true
     },
     "autoload": {
         "psr-4": {
@@ -57,8 +57,8 @@
             "@analyze",
             "@test",
             "@inspect",
-            "@style",
-            "rector process -vv"
+            "rector process",
+            "@style"
         ],
         "deduplicate": "phpcpd app/ src/",
         "inspect": "deptrac analyze --cache-file=build/deptrac.cache",
